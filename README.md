@@ -1,4 +1,3 @@
-Project Console: https://console.firebase.google.com/project/fir-crud-52d2d/overview
 Hosting URL: https://fir-crud-52d2d.web.app
 
 # 1. Firebase 프로젝트 설정
