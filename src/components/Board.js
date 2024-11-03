@@ -1,29 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { db } from "../firebase";
 import {
-  collection,
   addDoc,
-  getDocs,
-  updateDoc,
+  collection,
   deleteDoc,
   doc,
-  query,
+  onSnapshot,
   orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { db } from "../firebase";
 
 const Board = ({ user }) => {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-      const querySnapshot = await getDocs(q);
+    const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+
+    // 실시간 업데이트 구독 설정
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       setPosts(
         querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
       );
-    };
-    fetchPosts();
+    });
+
+    // 컴포넌트 언마운트 시 구독 해제
+    return () => unsubscribe();
   }, []);
 
   const addPost = async () => {
@@ -31,27 +35,20 @@ const Board = ({ user }) => {
     const post = {
       content: newPost,
       author: user.email,
-      createdAt: new Date(),
+      createdAt: serverTimestamp(), // 서버 타임스탬프 사용
     };
-    const docRef = await addDoc(collection(db, "posts"), post);
-    setPosts([{ id: docRef.id, ...post }, ...posts]);
+    await addDoc(collection(db, "posts"), post);
     setNewPost("");
   };
 
   const updatePost = async (id, updatedContent) => {
     const postRef = doc(db, "posts", id);
     await updateDoc(postRef, { content: updatedContent });
-    setPosts(
-      posts.map((post) =>
-        post.id === id ? { ...post, content: updatedContent } : post
-      )
-    );
   };
 
   const deletePost = async (id) => {
     const postRef = doc(db, "posts", id);
     await deleteDoc(postRef);
-    setPosts(posts.filter((post) => post.id !== id));
   };
 
   return (
@@ -80,8 +77,9 @@ const Board = ({ user }) => {
               : {post.content}
               <br />
               <small>
-                {post.createdAt &&
-                  new Date(post.createdAt.seconds * 1000).toLocaleString()}
+                {post.createdAt && post.createdAt.seconds
+                  ? new Date(post.createdAt.seconds * 1000).toLocaleString()
+                  : "Loading..."}
               </small>
             </span>
             {user && post.author === user.email && (
