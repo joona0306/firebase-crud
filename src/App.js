@@ -33,7 +33,14 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
+    <div
+      style={{
+        width: "450px",
+        margin: "0 auto",
+        padding: "20px",
+        fontFamily: "Arial",
+      }}
+    >
       <h1>파이어베이스를 이용한 CRUD 및 인증</h1>
       {user ? (
         <>

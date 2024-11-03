@@ -7,6 +7,8 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  query,
+  orderBy,
 } from "firebase/firestore";
 
 const Board = ({ user }) => {
@@ -15,7 +17,8 @@ const Board = ({ user }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const querySnapshot = await getDocs(collection(db, "posts"));
+      const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
       setPosts(
         querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
       );
@@ -31,7 +34,7 @@ const Board = ({ user }) => {
       createdAt: new Date(),
     };
     const docRef = await addDoc(collection(db, "posts"), post);
-    setPosts([...posts, { id: docRef.id, ...post }]);
+    setPosts([{ id: docRef.id, ...post }, ...posts]);
     setNewPost("");
   };
 
@@ -54,7 +57,7 @@ const Board = ({ user }) => {
   return (
     <div>
       <h2>All Posts</h2>
-      {user ? ( // 로그인된 사용자만 글 작성 가능
+      {user ? (
         <div>
           <input
             type="text"
@@ -68,27 +71,34 @@ const Board = ({ user }) => {
         <p>Please log in to create or manage posts.</p>
       )}
       <ul>
-        {posts.map((post) => (
+        {posts.map((post, index) => (
           <li key={post.id}>
             <span>
-              <strong>{post.author}</strong>: {post.content}
+              <strong>
+                {index + 1}. {post.author}
+              </strong>
+              : {post.content}
+              <br />
+              <small>
+                {post.createdAt &&
+                  new Date(post.createdAt.seconds * 1000).toLocaleString()}
+              </small>
             </span>
-            {user &&
-              post.author === user.email && ( // 로그인한 사용자 본인만 수정/삭제 가능
-                <>
-                  <button
-                    onClick={() =>
-                      updatePost(
-                        post.id,
-                        prompt("Update post content", post.content)
-                      )
-                    }
-                  >
-                    Edit
-                  </button>
-                  <button onClick={() => deletePost(post.id)}>Delete</button>
-                </>
-              )}
+            {user && post.author === user.email && (
+              <>
+                <button
+                  onClick={() =>
+                    updatePost(
+                      post.id,
+                      prompt("Update post content", post.content)
+                    )
+                  }
+                >
+                  Edit
+                </button>
+                <button onClick={() => deletePost(post.id)}>Delete</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
