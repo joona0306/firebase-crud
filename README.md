@@ -296,3 +296,27 @@ function App() {
 
 export default App;
 ```
+
+# 8. .firebase .gitignore에 추가
+
+- .firebase
+- 이미 커밋에 .firebase 폴더가 포함된 경우 .Git에서 해당 폴더 제거해야 한다.
+
+```bash
+git rm -r --cached .firebase
+git commit -m "Remove .firebase folder from repository"
+git push origin main
+```
+
+# 9. firebase deploy
+
+- 터미널에서 실행
+- npm run build
+- npm install -g firebase-tools
+- firebase login
+- firebase init
+- ? Which Firebase features do you want to set up for this directory?
+  (\*) Hosting: Configure files for Firebase Hosting and (optionally) set up GitHub Action deploys
+- What do you want to use as your public directory? build
+- Configure as a single-page app (rewrite all urls to /index.html)? (y/N) y
+- ? File build/index.html already exists. Overwrite? (y/N) N
