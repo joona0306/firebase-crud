@@ -1,6 +1,6 @@
 // src/App.js
-import { signOut } from "firebase/auth";
-import React, { useState } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import Board from "./components/Board";
 import Login from "./components/Login";
 import { auth } from "./firebase";
@@ -8,6 +8,20 @@ import "./style.css";
 
 function App() {
   const [user, setUser] = useState(null);
+
+  // Firebase 인증 상태 변화를 감지하여 로그인 상태 유지
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser); // 로그인된 사용자 설정
+      } else {
+        setUser(null); // 로그아웃 시 상태 초기화
+      }
+    });
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 정리
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     try {
