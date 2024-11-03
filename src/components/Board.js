@@ -53,19 +53,19 @@ const Board = ({ user }) => {
 
   return (
     <div>
-      <h2>All Posts</h2>
+      <h2>글 목록</h2>
       {user ? (
         <div>
           <input
             type="text"
             value={newPost}
             onChange={(e) => setNewPost(e.target.value)}
-            placeholder="Write a new post"
+            placeholder="새로운 글 작성하기"
           />
-          <button onClick={addPost}>Add Post</button>
+          <button onClick={addPost}>글 등록하기</button>
         </div>
       ) : (
-        <p>Please log in to create or manage posts.</p>
+        <p>로그인 후 글 작성 해주세요.</p>
       )}
       <ul>
         {posts.map((post, index) => (
@@ -88,13 +88,13 @@ const Board = ({ user }) => {
                   onClick={() =>
                     updatePost(
                       post.id,
-                      prompt("Update post content", post.content)
+                      prompt("작성 글 수정하기", post.content)
                     )
                   }
                 >
-                  Edit
+                  수정
                 </button>
-                <button onClick={() => deletePost(post.id)}>Delete</button>
+                <button onClick={() => deletePost(post.id)}>삭제</button>
               </>
             )}
           </li>
